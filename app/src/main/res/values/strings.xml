@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">ArduinoTemp</string>
     <string name="action_settings">Settings</string>
+
+    <string name="preferences_key">ARDUINOTEMP</string>
+    <string name="saved_ip">ip</string>
+    <string name="save">Salvar</string>
+    <string name="ip_address">Endereço IP</string>
+    <string name="saved">IP Salvo!</string>
+    <string name="enter_ip_address">Configure um endereço de IP.</string>
+
+
 </resources>

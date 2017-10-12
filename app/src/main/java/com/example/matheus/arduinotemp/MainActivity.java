@@ -11,15 +11,23 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private final String LTAG = getClass().getSimpleName();
     private TextView tvTemperatura;
     private Thread refreshThread;
     private int temp;
     private RelativeLayout background;
+    private ImageButton btnSettings;
+    private ImageButton btnPause;
+    private boolean flagThread;
+
+
 
 
 
@@ -34,19 +42,51 @@ public class MainActivity extends AppCompatActivity {
 
         tvTemperatura = (TextView) findViewById(R.id.tvTemperatura);
         background = (RelativeLayout) findViewById(R.id.relativeBackground);
+        (btnPause = (ImageButton) findViewById(R.id.btnPause)).setOnClickListener(this);
+        (btnSettings = (ImageButton) findViewById(R.id.btnSettings)).setOnClickListener(this);
     }
+
+
 
     @Override
     protected void onStart() {
         super.onStart();
-        final boolean flagThread = true;
+        //startThread();
+    }
 
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.btnPause:
+                if (flagThread){ //Clicando para pausar
+                    btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
+                    stopThread();
+                }else{ //Clicando para iniciar
+                    btnPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+                    startThread();
+                }
+                break;
+
+            case R.id.btnSettings:
+                CustomDialog.getInstance().showInputDialog(MainActivity.this,getString(R.string.enter_ip_address));
+                break;
+
+        }
+    }
+
+
+
+    private void startThread(){
+        flagThread = true;
         refreshThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.i(LTAG,"startThread() THREAD INICIADA");
                 while (flagThread){
-                    TempService.getInstance().requisicaoTemperature(MainActivity.this,"http://192.168.1.12/");
+                    TempService.getInstance().requisicaoTemperature(MainActivity.this,Preferences.getInstance().retrieve(MainActivity.this));
                     try {Thread.sleep(2000);} catch (Throwable t) {t.printStackTrace();}
                     temp = (int) TempService.getInstance().getTemperature();
 
@@ -61,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         refreshThread.start();
+    }
+
+
+
+    private void stopThread(){
+        flagThread = false;
+        Log.i(LTAG,"stopThread() THREAD PAUSADA");
     }
 
 
